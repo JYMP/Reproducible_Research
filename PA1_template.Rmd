@@ -21,7 +21,7 @@ if (!file.exists("PA1")){
         download.file(fileurl, destfile = "./PA1/Activity_Monitoring.zip")
         unzip("./PA1/Activity_Monitoring.zip", exdir = "./PA1")
 }
-activity <- read.csv("./PA1/activity.csv")
+
 ```
 
 # What is mean total number of steps taken per day?
@@ -33,16 +33,17 @@ For this part of the assignment, you can ignore the missing values in the datase
 
 
 ```{r}
-steps <- dplyr::group_by(activity, date)
+activity <- read.csv("./PA1/activity.csv")
+steps <- group_by(activity, date)
 
-steps <- dplyr::mutate(steps, total = sum(steps, na.rm = TRUE))
-steps <- dplyr::mutate(steps, mean = mean(steps, na.rm = TRUE))
-steps <- dplyr::mutate(steps, median = median(steps, na.rm = TRUE))
+steps <- mutate(steps, total = sum(steps, na.rm = TRUE))
+steps <- mutate(steps, mean = mean(steps, na.rm = TRUE))
+# steps <- mutate(steps, median = median(steps, na.rm = TRUE))
 
-mn <- dplyr::summarize(steps, mean = mean(total, na.rm = TRUE))
-md <- dplyr::summarize(steps, median = median(total, na.rm = TRUE))
-mean_steps <- dplyr::summarize(mn, mean = mean(mean, na.rm = TRUE))
-median_steps <- dplyr::summarize(md, median = median(median, na.rm = TRUE))
+mn <- summarize(steps, mean = mean(total, na.rm = TRUE))
+md <- summarize(steps, median = median(total, na.rm = TRUE))
+mean_steps <- summarize(mn, mean = mean(mean, na.rm = TRUE))
+median_steps <- summarize(md, median = median(median, na.rm = TRUE))
 
 df <- data.frame(c(mean_steps, median_steps))
 ```
@@ -60,8 +61,8 @@ qplot(total, data = steps, fill = date, xlab = "Total number of steps per day") 
     2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r}
-int <- dplyr::group_by(activity, interval)
-int <- dplyr::mutate(int, average = mean(steps, na.rm = TRUE))
+int <- group_by(activity, interval)
+int <- mutate(int, average = mean(steps, na.rm = TRUE))
 
 max.step <- int[which.max(int$average),]
 ```
@@ -69,7 +70,7 @@ max.step <- int[which.max(int$average),]
 Maximum 5-minute interval is `r max.step`
 
 ```{r, echo=TRUE}
-qplot(interval, average, data = int) + geom_line(linetype = 'l') + xlab("5-minute intervals") + 
+qplot(interval, average, data = int) + xlab("5-minute intervals") + 
         ylab("Average Steps Taken Per Day") + geom_vline(aes(xintercept = interval), data = max.step, colour = "red")
 ```
 
@@ -94,20 +95,20 @@ steps.filled <- steps
 k <- which(is.na(steps.filled$steps), arr.ind=TRUE)
 steps.filled$steps[k] <- 0
 
-steps.filled <- dplyr::mutate(steps.filled, total = sum(steps.filled, na.rm = TRUE))
-steps.filled <- dplyr::mutate(steps.filled, mean = mean(steps.filled, na.rm = TRUE))
-steps.filled <- dplyr::mutate(steps.filled, median = median(steps.filled, na.rm = TRUE))
+steps.filled <- mutate(steps.filled, total = sum(steps, na.rm = TRUE))
+steps.filled <- mutate(steps.filled, mean = mean(steps, na.rm = TRUE))
+# steps.filled <- mutate(steps.filled, median = median(steps, na.rm = TRUE))
 
-mn.filled <- dplyr::summarize(steps.filled, mean = mean(total, na.rm = TRUE))
-md.filled <- dplyr::summarize(steps.filled, median = median(total, na.rm = TRUE))
-mean_steps.filled <- dplyr::summarize(mn.filled, mean = mean(mean, na.rm = TRUE))
-median_steps.filled <- dplyr::summarize(md.filled, median = median(median, na.rm = TRUE))
+mn.filled <- summarize(steps.filled, mean = mean(total, na.rm = TRUE))
+md.filled <- summarize(steps.filled, median = median(total, na.rm = TRUE))
+mean_steps.filled <- summarize(mn.filled, mean = mean(mean, na.rm = TRUE))
+median_steps.filled <- summarize(md.filled, median = median(median, na.rm = TRUE))
 
 df.filled <- data.frame(c(mean_steps.filled, median_steps.filled))
 ```
 
-Mean number of steps per day is `r mean-steps.filled`
-Median number of steps per day is `r median-steps.filled`
+Mean number of steps per day is `r mean_steps.filled`
+Median number of steps per day is `r median_steps.filled`
 
 ```{r, echo=TRUE}
 qplot(total, data = steps.filled, fill = date, xlab = "Total number of steps per day") + 
